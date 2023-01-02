@@ -1,0 +1,82 @@
+@startuml
+
+title Deployment Diagram 
+' skinparam linetype ortho
+skinparam ranksep 5
+skinparam nodesep 5
+skinparam defaultTextAlignment center
+
+node "Infura" #OrangeRed {
+  label "Ethereum Node As A Service"
+}
+node "Ethereum Node" as eth_node  #LightSteelBlue
+node "Ethereum Node" as eth_node_2  #LightSteelBlue
+database "Ethereum Blockchain" as blockchain #SteelBlue {
+  artifact "Smart Marriage Proposal Contract" as smart_contract
+  agent "Ethereum Virtual Machine"  as EVM
+  collections Blocks as Block1
+  collections Blocks as Block2
+  collections Blocks as Block3
+}
+
+node "Smart Marriage Proposal Box" as box #AliceBlue {
+  
+  node "SayNo Button" as Button2 #Crimson
+  node "SayNo LED" as Led2 #Crimson
+  node "SayYes Button" as Button1 #LightSeaGreen
+  node "SayYes LED" as Led1 #LightSeaGreen 
+
+  node "Buzzer" #CadetBlue 
+  node "GPS" #CadetBlue 
+  node "MicroServo" as lock #CadetBlue
+  node "Camera" #CadetBlue
+
+  node "Arduino" #LightBlue {
+    component "ProposalFSM"
+    component "Geofence"
+    component "Locker"
+    component "Indicator"
+    component "Simple CLI"
+  }
+
+  node "RPi" #IndianRed {
+    artifact "Smart Marriage Proposal App" as app #LightPink { 
+      component "JSON CLI"
+      component "Camera Recorder"
+      component "Web3.py client" as web3
+      component "Contract API" as contract
+    }
+    
+    file "abi.json" as abi
+  }
+}
+
+  Arduino -right- RPi : UART
+  Arduino -up- Button2 : GPIO
+  Arduino -up- Led2 : GPIO
+  Arduino -up- Button1 : GPIO
+  Arduino -up- Led1 : GPIO
+
+  Arduino -- GPS : UART
+  Arduino -- Buzzer : GPIO
+  Arduino -- lock : PWM
+  ' Button1 -[hidden]-Button2 
+  ' Button1 -[hidden]-Led1 
+  ' Button2 -[hidden]-Led2 
+  ' Led1 -[hidden]-Led2 
+
+  RPi -up- Camera : CSI
+
+  contract *-up- abi
+  web3 .. Infura : JSON-RPC 
+  Infura -- blockchain
+  smart_contract .down.> EVM
+  Block1 .right. Block2 
+  Block2 .right. Block3
+  EVM .down. Block2
+  Infura .left. eth_node_2 : P2P TCP
+  eth_node -- blockchain
+  eth_node_2 -- blockchain
+  eth_node_2 .left. eth_node : P2P TCP
+
+@enduml

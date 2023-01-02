@@ -1,0 +1,8 @@
+{
+    "configuration": "cpu=atmega328old",
+    "board": "arduino:avr:nano",
+    "sketch": "arduino\\smart_proposal_box.ino",
+    "port": "COM3",
+    "programmer": "arduino:avrispmkii",
+    "output": "arduino\\output"
+}

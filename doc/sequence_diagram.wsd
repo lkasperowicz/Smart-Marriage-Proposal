@@ -1,0 +1,114 @@
+@startuml
+
+title "Smart Marriage Proposal - Sequence Diagram"
+skinparam SequenceDividerBackgroundColor DeepSkyBlue
+
+actor "M."  as m #OrangeRed
+participant "Smart Marriage Proposal Box" as box #AliceBlue 
+actor "Me" as me #DeepSkyBlue 
+participant "Smart Marriage Proposal Contract" as blockchain #SteelBlue
+me -[hidden]> blockchain :  .....................................
+me -> m : Give the gift (Smart Marriage Proposal Box)
+return "Oooo. Thanks!"
+...
+...** Wait till <u>that</u> day comes **...
+...
+me -> m : "Let's go to the beach!"
+m --> me : "No!"
+...
+...
+...** Wait for it a little more **...
+...
+me -> m : "Let's go to the seaside!"
+m --> me : "Yupi!
+||| 
+||| 
+== At the seaside ==
+box -> box : Check position
+activate box #IMPLEMENTATION
+box -> box : verifyLocation
+note right
+It is not inside the geofence
+end note
+return false
+||| 
+||| 
+box -> box : Check position
+activate box #IMPLEMENTATION
+box -> box : verifyLocation() 
+note right
+It is inside the geofence
+end note
+return true
+box -> box : Geofence alert
+activate box #IMPLEMENTATION
+box -> blockchain : verifyLocation()
+||| 
+blockchain -> box : Location Verified Event
+box -> box
+note right 
+    Generate timestamp when 
+    the proposal will happen
+end note
+box -> blockchain : setProposalExpectedTime(timestamp)
+note right
+Expected time of the proposal is stored. 
+The proposal is possible only around a given timestamp
+end note
+||| 
+blockchain -> box : Proposal Expected Time Event 
+note left
+Save time when the proposal will happen
+end note
+...
+... Wait till current time is equal expected time of proposal...
+...
+box -> box : Proposal Event
+note right
+Buzzer sounds, LEDs are flashing
+The Box is unlocked, camera is recording 
+end note
+box -> m : "Will you marry me?"
+box -> me : "On your knees!"
+note right
+ Telepathic message :-)
+end note
+deactivate box 
+me -> m : **"Will you marry me?""** 
+m --> me : **"Yes, I will.""**
+m -> box : Click YesButton
+activate box #PaleGreen
+box -> box: TakeProposalPhotos() 
+note right
+Save a few photos. 
+Calculate hash of one photo for her proof of proposal.
+Calculate hash of second photo for his proof of proposal.
+end note
+activate box #TECHNOLOGY
+return her_proof_hash, his_proof_hash
+box -> blockchain : sayYes(latitude, longitude, her_proof_hash, his_proof_hash)
+note right
+Store a geographic coordinate of marriage proposal, 
+her proof hash and his proof hash
+end note
+||| 
+blockchain -> box : Said Yes Event
+box -> box : Notify()
+activate box #TECHNOLOGY
+box -> m 
+note left 
+Send an email with her proof photo
+end note
+box -> me
+note left 
+Send an email with his proof photo
+end note
+return
+box --> box 
+deactivate box
+|||
+|||
+m <-> me : <color:red>**<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3**</color>
+|||
+|||
+@enduml
